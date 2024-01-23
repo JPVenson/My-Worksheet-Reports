@@ -1,0 +1,259 @@
+
+.content-area {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.envolpe-address {
+    margin-left: 2.6cm;
+}
+
+.envlope-window {
+    top: 5.1cm;
+    left: 2.5cm;
+    height: 3.45cm;
+    width: 9cm;
+    position: absolute;
+    border-style: dashed;
+    border-color: coral;
+    border-width: 2px;
+}
+
+.position-envlope-window {
+    top: 5.1cm;
+    left: 2.5cm;
+    height: 3.45cm;
+    width: 9cm;
+    position: absolute; 
+}
+
+.envlope-window {
+    position: absolute; 
+
+    border-style: dashed;
+    border-color: coral;
+    border-width: 2px;
+}
+
+.parent-cooperate {
+    height: 5.1cm;
+}
+
+.invoice-body {
+    margin-top: 1cm;
+}
+
+/* heading */
+
+h1 {
+    font: bold 100% sans-serif;
+    margin-bottom: 5px;
+    padding: 15px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+/* table */
+
+table {
+    font-size: 75%;
+    table-layout: fixed;
+    width: 100%;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
+tr td {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+th, td {
+    border-width: 1px;
+    padding: 0;
+    text-align: left;
+    border-radius: 0.25em;
+    border-style: solid;
+}
+
+.table td.fit, 
+.table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}
+
+th {
+    background: #EEE;
+    border-color: #BBB;
+}
+
+td {
+    border-color: #DDD;
+}
+
+tr.work-unit {
+    
+}
+
+th.time {
+    width: 12rem;
+}
+th.description {
+    /* width: 10rem; */
+}
+th.rate {
+    width: 4rem;
+}
+th.quantity {
+    width: 5rem;
+}
+th.net {
+    width: 6rem;
+}
+th.tax {
+    width: 8rem;
+}
+th.price {
+    width: 6rem;
+}
+
+/* article */
+
+article, article address, table.meta, table.inventory {
+    /* margin: 0 0 3em; */
+}
+
+    article.page {
+        background: #FFF;
+        border-radius: 1px;
+        box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5);
+        box-sizing: border-box;
+        margin: 1rem auto;
+        /* margin: 0rem 10rem 1rem 1rem; */
+        /* overflow: hidden; */
+        page-break-after: avoid !important;
+        position: relative;
+        width: 210mm;
+        height: 297mm;
+    }
+
+    article:after {
+        clear: both;
+        content: "";
+        display: table;
+    }
+
+header {
+    margin: 0 0 2.5em;
+}
+
+    header:after {
+        clear: both;
+        content: "";
+        display: table;
+    }
+
+    header h2 {
+        background: #000;
+        border-radius: 0.25em;
+        color: #FFF;
+        margin: 0 0 1em;
+        padding: 0.5em 0;
+    }
+
+    header address {
+        float: left;
+        font-size: 75%;
+        font-style: normal;
+        line-height: 1.25;
+    }
+
+        header address p {
+        }
+
+    header span, header img {
+        display: block;
+        float: right;
+    }
+
+    header span {
+        /*margin: 0 0 1em 1em;*/
+        max-height: 25%;
+        /*max-width: 60%;*/
+        /*position: relative;*/
+    }
+
+    header img {
+        max-height: 100%;
+        max-width: 100%;
+    }
+
+
+@media print {
+
+    *{
+        font-size: 1rem;
+    }
+
+    article.page {
+        background: none;
+        box-shadow: none;
+        page-break-after: always;
+        width: 100vw;
+        height: 99vh;
+    }
+
+    html {
+        background: none;
+    }
+
+    body {
+        box-shadow: none;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+
+    /* ... the rest of the rules ... */
+}
+
+@page {
+    size: A4;
+}
+
+.assert-page img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+footer {
+    position: absolute;
+    bottom: 1px;
+    width: 100%;
+    /*text-align: center;*/
+    font-size: 0.9rem
+}
+
+.details-box {
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.center {
+    text-align: center;
+}
+
+.clear-float {
+    float: none;
+}
+
+hr.hr-doubble {
+    margin-top: 0;
+    margin-bottom: 0.01rem;
+}

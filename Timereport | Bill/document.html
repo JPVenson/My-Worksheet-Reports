@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Invoice</title>
+    <style>
+    {{#IMPORT "css"}} 
+    </style>
+</head>
+{{#VAR TimeFormat = "h"}}
+
+{{#SCOPE DataSource}}
+<body>
+	<header>
+		<h1>Time Report</h1>
+		<address>
+			{{#SCOPE CreatorAddress}}
+			<p>{{CompanyName.ValueOrNA()}}</p>
+			<p>{{FirstName.ValueOrNA()}} {{LastName.ValueOrNA()}}</p>
+			<p>{{Street.ValueOrNA()}} {{StreetNo.ValueOrNA()}}</p>
+			<p>{{ZipCode.ValueOrNA()}} {{City.ValueOrNA()}}-{{Country.ValueOrNA()}}</p>
+			<p>{{Phone.ValueOrNA()}}</p>
+			<p>{{Email.ValueOrNA()}}</p>
+			{{/SCOPE}}
+		</address>
+		<span>
+			<img class="img float-left" src="https://jean-pierre-bachmann.dev/Content/Icons/1437513465_vector_65_01.svg" style="width: 100%; max-width: 100px;" alt="{{CompanyName.ValueOrNA()}}" />            
+		</span>
+	</header>
+	<article>
+		<h2>Recipient</h2>
+		<address>
+			{{#SCOPE OwnerAddress}}
+			<p>{{CompanyName.ValueOrNA()}}</p>
+			<p>{{Street.ValueOrNA()}} {{StreetNo.ValueOrNA()}}</p>
+			<p>{{ZipCode.ValueOrNA()}} {{City.ValueOrNA()}}-{{Country.ValueOrNA()}}</p>
+			<p>{{Phone.ValueOrNA()}}</p>
+			<p>{{Email.ValueOrNA()}}</p>
+			{{/SCOPE}}
+		</address>
+		<table class="meta">
+			{{#SCOPE Worksheet.No}}
+			<tr>
+				<th>
+					<span>For Invoice</span>
+				</th>
+				<td>
+					<span>#: {{.}}</span>
+				</td>
+			</tr>
+			{{/SCOPE}}
+			{{#SCOPE Worksheet.ServiceDescription}}
+			<tr>
+				<th>
+					<span>Description: </span>
+				</th>
+				<td>
+					<span>{{.}}</span>
+				</td>
+			</tr>
+			{{/SCOPE}}
+			<tr>
+				<th>
+					<span>Date</span>
+				</th>
+				<td>
+					<span>{{DateOfCreation.ToString("d")}}</span>
+				</td>
+			</tr>
+		</table>
+
+		<table class="table">
+			<thead>
+                <tr>
+					<th colspan="3" class="dateHeader">
+						<span>Day</span>
+					</th>
+                </tr>
+				<tr>
+					<th>
+						<span>From Time</span>
+					</th>
+					<th>
+						<span>To Time</span>
+					</th>
+					<th>
+						<span>Worktime (Minutes)</span>
+					</th>
+				</tr>
+                <tr>            
+					<th colspan="3">
+						<span>Description</span>
+					</th>
+                </tr>
+			</thead>
+			<tbody>
+            {{#DECLARE displayItemsPartial}}
+                <tr>
+                    <td>
+                        <span>{{FromTime.Time(TimeFormat)}}</span>
+                    </td>
+                    <td>
+                        <span>{{ToTime.Time(TimeFormat)}}</span>
+                    </td>
+                    <td>
+                        <span>{{(ToTime - FromTime).Time(TimeFormat)}}</span>
+                        <span>({{(ToTime - FromTime)}} Minutes)</span>
+                    </td>
+                </tr>
+                {{#SCOPE Comment}}
+                    <tr>                        
+                        <td colspan="3">
+                            <span style="font-style: italic;">{{.}}</span>
+                        </td>
+                    </tr>
+                {{/SCOPE}}
+            {{/DECLARE}}
+            {{#EACH WorksheetItems.OrderBy("DateOfAction descending").Reverse().GroupBy("DateOfAction") AS that}}
+                {{#EACH that.FlatGroup().OrderBy("FromTime").Take(1)}}
+                <tr style="padding-top: 10px">
+                    <td colspan="3" class="dateHeader">
+                        {{#LET totalWeekTime = that.FlatGroup().Select("ToTime - FromTime").Sum()}}
+                        <span>{{DateOfAction.ToString("d")}} {{totalWeekTime.Time(TimeFormat)}} ({{totalWeekTime}} Minutes)</span>
+                    </td>
+                </tr>
+                {{/EACH}}
+
+                {{#EACH that.FlatGroup().OrderBy("FromTime")}}                
+                    {{#IMPORT "displayItemsPartial"}}
+                {{/EACH}}
+                <tr></tr>
+            {{/each}}
+			</tbody>
+		</table>
+	</article>
+	<aside>
+		<h2>
+			<span>
+            {{#VAR totalHours = WorksheetItems.Select("it.ToTime - it.FromTime").Sum()}}
+				{{(totalHours).Time("h")}} ({{totalHours.Time("d")}}) Stunden Total. Datum: __________________________________
+			</span>
+			<hr />
+			<br />
+			<br />
+			<span>Name: _________________________ Unterschrift und Stempel: _________________________ </span>
+		</h2>
+	</aside>
+</body>
+{{/SCOPE}}
+</html>

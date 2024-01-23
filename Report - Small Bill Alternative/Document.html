@@ -1,0 +1,257 @@
+{{#PdfFooter #Height 40 |--}}
+    <div class="page-footer" style="color: black; width: 100%; text-align: center; font-size: 6px;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>
+{{--| /PdfFooter}}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Invoice</title>
+    <style type="text/css">
+        {{#IMPORT 'css'}}
+    </style>
+    <style>
+        {{!ExternalHttp("https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css")}}
+        {{#IMPORT "bootstrapcss"}}
+    </style>
+</head>
+{{#SCOPE DataSource}}
+<body class="container-fluid no-gutter">	
+	<article class="page">    
+        <div class="envlope-window position-envlope-window no-print">
+        </div>
+        <address class="address-envlope-window position-envlope-window">
+            {{#SCOPE OwnerAddress}}
+            <span>{{CompanyName.ValueOrNA()}}</span> <br/>
+            <span>{{FirstName.ValueOrNA()}} {{LastName.ValueOrNA()}}</span> <br/>
+            <span>{{Street.ValueOrNA()}} {{StreetNo.ValueOrNA()}}</span> <br/>
+            <span>{{ZipCode.ValueOrNA()}} {{City.ValueOrNA()}}</span> <br/>
+            {{/SCOPE}}
+        </address>
+        <h1>Invoice</h1>
+        <header class="row no-gutters">
+            <span class="col-6">
+                <img class="img float-left" src="https://my-worksheet.com/Icons/1437513465_vector_65_01.svg" style="width: 100%; max-width: 100px;" alt="{{CompanyName.ValueOrNA()}}" />
+            </span>
+            <address class="col-6 text-right">
+                <div>
+                {{#SCOPE CreatorAddress}}
+                    <span>{{CompanyName.ValueOrNA()}}</span> <br/>
+                    <span>{{FirstName.ValueOrNA()}} {{LastName.ValueOrNA()}}</span> <br/>
+                    <span>{{Street.ValueOrNA()}} {{StreetNo.ValueOrNA()}}</span> <br/>
+                    <span>{{ZipCode.ValueOrNA()}} {{City.ValueOrNA()}}-{{Country.ValueOrNA()}}</span> <br/>
+                    <span>Phone: {{Phone.ValueOrNA()}}</span> <br/>
+                    <span>{{Email.ValueOrNA()}}</span> <br/>
+                {{/SCOPE}}
+                </div>                
+            </address>
+	    </header>
+		<div class="row m-0">
+            <div class="offset-7"> 
+                <table class="meta float-right">
+                    <tr>
+                        <th class="text-center" colspan="2">
+                            <span class="mr-1">Abschlagszahlung nach Projektvertrag</span>
+                        </th>
+                    </tr>
+                    {{#IF Worksheet.No}}
+                    <tr>
+                        <th class="text-right">
+                            <span class="mr-1">Invoice</span>
+                        </th>
+                        <td>
+                            <span>#: {{Worksheet.No}}</span>
+                        </td>
+                    </tr>
+                    {{/IF}}
+                    {{#IF Project.ProjectReference}}
+                    <tr>
+                        <th class="text-right">
+                            <span class="mr-1">Customer Reference</span>
+                        </th>
+                        <td>
+                            <span>{{Project.ProjectReference}}</span>
+                        </td>
+                    </tr>
+                    {{/IF}}
+                    <tr>
+                        <th class="text-right">
+                            <span class="mr-1">Date</span>
+                        </th>
+                        <td>
+                            <span>{{DateOfCreation.ToString("d")}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-right">
+                            <span class="mr-1">Project Description</span>
+                        </th>
+                        <td>
+                            <span>{{Worksheet.ServiceDescription}}</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>           
+        </div>
+        <div class="invoice-body">            
+            <p>{{AdditonalInfos}}</p>
+            {{#var cost = 0D}}
+            {{#IF WorksheetsWithRates}}
+            <table>        
+                <!-- Display worked times -->
+                <thead>
+                    <tr class="work-unit">
+                        <th class="time">
+                            <span>From - To</span>
+                        </th>
+                        <th class="description">
+                            <span>Description</span>
+                        </th>
+                        <th class="rate">
+                            <span>Rate</span>
+                        </th>
+                        <th class="quantity">
+                            <span>Quantity</span>
+                        </th>
+                        <th class="net">
+                            <span>Net</span>
+                        </th>
+                        <th class="tax">
+                            <span>Tax</span>
+                        </th>
+                        <th class="price">
+                            <span>Price</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>                
+                    {{#FOREACH wsItems IN WorksheetsWithRates}}     
+                    {{#VAR rate = wsItems.Key}}
+                    {{#VAR wsItem = wsItems.Value.OrderBy("it.DateOfAction")}}
+                    {{#var Worktime = wsItem.Select("ToTime - FromTime").Sum()}}   
+                    {{#var Net = Worktime.Divide(60D).Round(2).Multiply(rate.Rate).Round(2)}}
+                    {{#var Tax = Net.Divide(100D).Multiply(rate.TaxRate).Round(2)}}
+                    {{#var WorkCost = Net.Plus(Tax)}}
+                    {{#var cost = cost.Plus(WorkCost)}}
+                    <tr class="work-unit">
+                        <td>
+                            <span>{{wsItem.Select("it.DateOfAction").Min().ToString("d")}} 
+                                - {{wsItem.Select("it.DateOfAction").Max().ToString("d")}}</span>
+                        </td>
+                        <td>
+                            <span>Arbeitsleistungen nach Projektvertragsbeschreibung</span>
+                        </td>
+                        <td>
+                            <span data-prefix>€</span><span>
+                                {{rate.Rate}}
+                            </span>
+                        </td>
+                        <td>                     
+                            <span>{{Worktime.Time("d")}}</span>
+                        </td>
+                        <td>
+                            <span data-prefix>€</span><span>
+                                {{Net.ToString("F2")}}
+                            </span>
+                        </td>
+                        <td>
+                            <span>({{rate.TaxRate}}%)</span>
+                            <span data-prefix>€</span><span>
+                                {{Tax.ToString("F2")}}
+                            </span>
+                        </td>
+                        <td>
+                            <span data-prefix>€</span>
+                            <span>{{WorkCost.ToString("F2")}}</span>
+                        </td>
+                    </tr>
+                    {{/FOREACH}}
+                </tbody>                
+            </table>
+            {{/IF}}
+             <!-- Display worksheet asserts -->    
+                {{#IF Asserts}}    
+            <table>    
+                <thead>
+                    <tr>
+                        <th>
+                            <span>Name</span>
+                        </th>
+                        <th colspan="3">
+                            <span>Description</span>
+                        </th>
+                        <th>
+                            <span>Net</span>
+                        </th>
+                        <th>
+                            <span>Tax</span>
+                        </th>
+                        <th>
+                            <span>Price</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{#FOREACH assert IN Asserts}}
+                    <tr>
+                        <td>{{assert.Name}}</td>
+                        <td colspan="3">{{assert.Description}}</td>
+                        {{#var Net = assert.Value.Round(2)}}
+                        {{#var TaxValue = Net.Divide(100).Multiply(assert.Tax).Round(2)}}
+                        {{#var WorkCost = Net.Plus(TaxValue)}}
+                        <td><span data-prefix>€</span>{{Net}}</td>
+                        <td><span data-prefix>€</span>{{TaxValue}} ({{assert.Tax.Round(2)}}%)</td>
+                        <td><span data-prefix>€</span><span>{{WorkCost}}</span></td>
+                    </tr>
+                    {{#var cost = cost.Plus(WorkCost)}}                    
+                {{/FOREACH}}
+                </tbody>        
+            </table>    
+            {{/IF}}
+            <hr />
+
+            <div class="row">          
+                <div class="col">
+                    <table>
+                        {{#FOREACH item IN PaymentInfos}}
+                        <tr>
+                            <th class="w-25 text-right">
+                                <span class="mr-1">
+                                {{item.FieldName}}
+                                </span>
+                            </th>
+                            <td>{{item.FieldValue}}</td>
+                        </tr>
+                        {{/FOREACH}} 
+                    </table>                
+                </div>
+                <div class="col">
+                    <table>
+                        <tr>
+                            <th class="text-right">
+                                <span class="mr-1">Total</span>
+                            </th>
+                            <td>    
+                                <span data-prefix>€</span><span>
+                                    {{cost.ToString("F2")}}
+                                </span>                             
+                                <hr class="hr-doubble"/>
+                                <hr class="hr-doubble"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <footer class="text-center">
+            <hr />
+            {{#IF PaymentInfoGroup.PaymentDisclaimer}}
+                <h3>
+                    <span>Additional Notes</span>
+                </h3>
+                <p>{{PaymentInfoGroup.PaymentDisclaimer}}</p>
+            {{/IF}} 
+        </footer>
+	</article>
+</body>
+{{/SCOPE}}
+</html>
